@@ -69,7 +69,6 @@ function populateBookmarkFolderOptions() {
 // Function to save the bookmark to the selected folder
 function saveBookmark() {
     var folderId = document.getElementById('folderSelect').value;
-    var makeDefaultFolder = document.getElementById('defaultFolderCheckbox').checked;
 
     chrome.tabs.query({ 'currentWindow': true, 'highlighted': true }, function(tabs) {
         // Check if there are any highlighted tabs
@@ -89,14 +88,21 @@ function saveBookmark() {
                     chrome.runtime.sendMessage({ message: ['Bookmark saved:', result] });
                 });
             });
-            if (makeDefaultFolder == true){
-                chrome.storage.sync.set({'defaultFolderId': folderId}, function() {
-                    chrome.runtime.sendMessage({ message: 'Folder ID saved'});
-                  });
-            }
         }
     });
+    var feedbackDiv = document.getElementById('saved');
+    feedbackDiv.textContent = 'Bookmark saved!';
     populateBookmarkFolderOptions();//refresh saved folders list of bookmark
+}
+
+function setDefaultFolder(){
+    var folderId = document.getElementById('folderSelect').value;
+    chrome.storage.sync.set({'defaultFolderId': folderId}, function() {
+        chrome.runtime.sendMessage({ message: 'Folder ID saved'});
+        });
+            // Simulate a successful action by updating the UI
+    var feedbackDiv = document.getElementById('saved');
+    feedbackDiv.textContent = 'Default folder set!';
 }
 
 // Function to save the bookmark to the selected folder
@@ -128,6 +134,8 @@ function deleteBookmark() {
             });
         }
     });
+    var feedbackDiv = document.getElementById('saved');
+    feedbackDiv.textContent = 'Bookmark deleted!';
 
 }
 
@@ -140,7 +148,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     document.getElementById('saveButton').addEventListener('click', saveBookmark);
     document.getElementById('deleteButton').addEventListener('click', deleteBookmark);
-
+    document.getElementById('setDefaultButton').addEventListener('click', setDefaultFolder);
 });
 
 chrome.commands.onCommand.addListener(function(command) {
