@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Save Bookmark</title>
+    <link rel="stylesheet" href="static/style.css">
+    <script src="static/bookmarks.js" defer></script>
+</head>
+<body>
+    <h3>Folder to save to:</h3>
+    <input type="text" id="searchInput" placeholder="Search...">
+
+    <select id="folderSelect">
+        <!-- Populate options dynamically using JavaScript -->
+    </select>
+    <input type="checkbox" id="defaultFolderCheckbox">
+    <label for="defaultFolderCheckbox">Make default folder</label>
+    
+    <h3>Bookmark's saved folders:</h3>
+    <select id="bookmarkFolderSelect">
+        <!-- Populate options dynamically using JavaScript -->
+    </select>
+    <br>
+    <br>
+
+    <button id="saveButton">Save Bookmark</button>
+    <button id="deleteButton">Delete Bookmark</button>
+
+</body>
+</html>
