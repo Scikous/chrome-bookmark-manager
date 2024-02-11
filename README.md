@@ -18,5 +18,6 @@ Allows for adding and deleting of tab's bookmark to/from multiple folders. Creat
 6. DONE
 
 ### Keyboard Shortcuts
+> :information_source: Before using, make sure to select a default folder
 - Ctrl+Shift+S - saves bookmark to default folder
 - Ctrl+Shift+Z - deletes bookmark from default folder
