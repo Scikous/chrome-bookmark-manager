@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "Bookmark Duper",
+  "description": "Allows for saving to multiple folders",
+  "version": "1.0",
+  "permissions": ["tabs", "background", "bookmarks", "storage"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "happy.png"
+  },
+    "background": {
+        "service_worker": "static/bgbookmarks.js"
+    },
+    "commands": {
+      "save-bookmark": {
+        "suggested_key": {
+          "default": "Ctrl+Shift+S",
+          "mac": "MacCtrl+Shift+S"
+        },
+        "description": "Save bookmark"
+      },
+      "delete-bookmark": {
+        "suggested_key": {
+          "default": "Ctrl+Shift+Z",
+          "mac": "MacCtrl+Shift+Z"
+        },
+        "description": "Delete Bookmark"
+      }
+    }
+  }
