@@ -50,11 +50,15 @@ function deleteBookmarkBG() {
                         // Delete the bookmark
                         chrome.bookmarks.search({ title: bookmark.title, url: bookmark.url }, function(results) {
                             if (results.length > 0) {
-                                chrome.bookmarks.remove(results[0].id, function() {
-                                console.log('Bookmark saved:', results[0], results.length);
-                                    });
-                                }
-                            });
+                                lastBookmarked = results.pop();
+                                console.log("Num bookmarks", results.length);
+                                
+                                chrome.bookmarks.remove(lastBookmarked.id, function() {
+                                console.log('Bookmark removed:', bookmark);
+                                populateBookmarkFolderOptions();//refresh saved folders list of bookmark
+                                });
+                            }
+                        });
                     });
                 }
             });
