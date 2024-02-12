@@ -1,4 +1,7 @@
 # chrome-bookmark-manager
+> [!CAUTION]
+> Does not use tab title for bookmark searching, only URL, may or may not cause issues
+
 Allows for adding and deleting of tab's bookmark to/from multiple folders. Created and held together with ChatGPT, Gemini, and <sub><sup><sub>me</sub></sup><sub>
 
 ## Features
@@ -9,7 +12,7 @@ Allows for adding and deleting of tab's bookmark to/from multiple folders. Creat
 - Keyboard shortcut for deleting current bookmark from default folder, and subsequent presses delete from other location(s)
 
 ## Usage
-> :information_source: I'm not paying 5$ to have this on the chrome web store 
+> :information_source: I'm not paying 5$ to have this on the chrome web store  
 
 1. Download and extract the `chrome-bookmark-manager` folder somewhere 
 2. Go to extensions (chrome://extensions)

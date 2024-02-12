@@ -139,7 +139,7 @@ function deleteBookmark(foldElemID='bookmarkFolderSelect') {
                 };
                 
                 // Delete the bookmark using Chrome's bookmarks API
-                chrome.bookmarks.search({ title: bookmark.title, url: bookmark.url }, function(results) {
+                chrome.bookmarks.search({ url: bookmark.url }, function(results) {
                     if (results.length > 0) {//bookmark exists or not
                         const chosenBookmarked = results.find((bookmarkID) => bookmarkID.parentId === bookmark.parentId);
                         results.pop(chosenBookmarked);
