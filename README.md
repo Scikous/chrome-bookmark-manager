@@ -2,11 +2,11 @@
 Allows for adding and deleting of tab's bookmark to/from multiple folders. Created and held together with ChatGPT, Gemini, and <sub><sup><sub>me</sub></sup><sub>
 
 ## Features
-- Add bookmark to selected folder
-- Delete bookmark from selected folder
-- Move bookmark from one folder to another
+- Add bookmark(s) to selected folder (works on single and multiple highlighted tabs)
+- Delete bookmark(s) from selected folder (^ same)
 - Choose default folder for bookmarks to be saved to (persistent)
-- Keyboard shortcuts for add and delete to/from default bookmark folder
+- Keyboard shortcut for adding to default bookmark folder
+- Keyboard shortcut for deleting current bookmark from default folder, and subsequent presses delete from other location(s)
 
 ## Usage
 > :information_source: I'm not paying 5$ to have this on the chrome web store 
@@ -21,4 +21,4 @@ Allows for adding and deleting of tab's bookmark to/from multiple folders. Creat
 ### Keyboard Shortcuts
 > :information_source: Before using, make sure to select a default folder
 - Ctrl+Shift+S - saves bookmark to default folder
-- Ctrl+Shift+Z - deletes bookmark from default folder
+- Ctrl+Shift+Z - deletes bookmark from currently highlighted and with subsequent presses from the next location
