@@ -4,6 +4,7 @@ Allows for adding and deleting of tab's bookmark to/from multiple folders. Creat
 ## Features
 - Add bookmark to selected folder
 - Delete bookmark from selected folder
+- Move bookmark from one folder to another
 - Choose default folder for bookmarks to be saved to (persistent)
 - Keyboard shortcuts for add and delete to/from default bookmark folder
 

@@ -86,13 +86,15 @@ function saveBookmark() {
                 chrome.bookmarks.create(bookmark, function(result) {
                     // log result
                     chrome.runtime.sendMessage({ message: ['Bookmark saved:', result] });
+                    populateBookmarkFolderOptions();//refresh saved folders list of bookmark
+
                 });
             });
         }
     });
     var feedbackDiv = document.getElementById('saved');
     feedbackDiv.textContent = 'Bookmark saved!';
-    populateBookmarkFolderOptions();//refresh saved folders list of bookmark
+    //populateBookmarkFolderOptions();//refresh saved folders list of bookmark
 }
 
 function setDefaultFolder(){
@@ -106,11 +108,10 @@ function setDefaultFolder(){
 }
 
 // Function to save the bookmark to the selected folder
-function deleteBookmark() {
-    var folderId = document.getElementById('folderSelect').value;
-
+function deleteBookmark(foldElemID='folderSelect') {
+    var folderId = document.getElementById(foldElemID).value;
     chrome.tabs.query({ 'currentWindow': true, 'highlighted': true }, function(tabs) {
-        // Check if there are any highlighted tabs
+    // Check if there are any highlighted tabs
         if (tabs && tabs.length > 0) {
             // Iterate through the highlighted tabs
             tabs.forEach(function(tab) {
@@ -123,7 +124,7 @@ function deleteBookmark() {
                 // Delete the bookmark using Chrome's bookmarks API
                 chrome.bookmarks.search({ title: bookmark.title, url: bookmark.url }, function(results) {
                     if (results.length > 0) {
-                        chrome.runtime.sendMessage({ message: results.length});
+                        chrome.runtime.sendMessage({ message: ["Num bookmarks", results.length]});
                         
                         chrome.bookmarks.remove(results[0].id, function() {
                         chrome.runtime.sendMessage({ message: ['Bookmark removed:', bookmark] });
@@ -136,19 +137,33 @@ function deleteBookmark() {
     });
     var feedbackDiv = document.getElementById('saved');
     feedbackDiv.textContent = 'Bookmark deleted!';
-
 }
 
+function moveBookmark(){//move bookmark from one folder to another
+    var feedbackDiv = document.getElementById('saved');
+    var numBookmarks = document.getElementById('bookmarkFolderSelect').length;
+    if (numBookmarks > 0){
+        var bookmarkFolderId = 'bookmarkFolderSelect';    
+        deleteBookmark(bookmarkFolderId);
+        setTimeout(() => {saveBookmark()}, 100);//delay execution a bit to avoid duplicate values folders being shown
+        feedbackDiv.textContent = 'Bookmark moved!';
+        chrome.runtime.sendMessage({ message: 'Bookmark successfully moved!'});
+    }
+    else{
+        feedbackDiv.textContent = 'No bookmark to move!';
+        chrome.runtime.sendMessage({ message: 'No bookmark to move'});
+    }
+}
 
 
 // Populate folder options when the popup is opened
 document.addEventListener('DOMContentLoaded', function() {
     populateFolderOptions();
     populateBookmarkFolderOptions();
-    
-    document.getElementById('saveButton').addEventListener('click', saveBookmark);
-    document.getElementById('deleteButton').addEventListener('click', deleteBookmark);
     document.getElementById('setDefaultButton').addEventListener('click', setDefaultFolder);
+    document.getElementById('saveButton').addEventListener('click', saveBookmark);
+    document.getElementById('moveButton').addEventListener('click',moveBookmark);
+    document.getElementById('deleteButton').addEventListener('click', function() {deleteBookmark()});
 });
 
 chrome.commands.onCommand.addListener(function(command) {
