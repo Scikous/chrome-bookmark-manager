@@ -48,14 +48,13 @@ function deleteBookmarkBG() {
                         };
 
                         // Delete the bookmark
-                        chrome.bookmarks.search({ title: bookmark.title, url: bookmark.url }, function(results) {
+                        chrome.bookmarks.search({url: bookmark.url }, function(results) {
                             if (results.length > 0) {
                                 lastBookmarked = results.pop();
                                 console.log("Num bookmarks", results.length);
                                 
                                 chrome.bookmarks.remove(lastBookmarked.id, function() {
                                 console.log('Bookmark removed:', bookmark);
-                                populateBookmarkFolderOptions();//refresh saved folders list of bookmark
                                 });
                             }
                         });
