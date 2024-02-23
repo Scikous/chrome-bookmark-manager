@@ -1,5 +1,5 @@
 // Function to populate the select dropdown with folder options
-function populateFolderOptions() {
+async function populateFolderOptions() {
     chrome.bookmarks.getTree(bookmarkTreeNodes => {
         const select = document.getElementById('folderSelect');
         const searchInput = document.getElementById('searchInput');
@@ -44,7 +44,7 @@ function populateFolderOptions() {
 }
 
 
-function populateBookmarkFolderOptions() {
+async function populateBookmarkFolderOptions() {
     const select = document.getElementById('bookmarkFolderSelect');
     select.innerHTML = '';
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
@@ -52,7 +52,6 @@ function populateBookmarkFolderOptions() {
         chrome.bookmarks.search({url: currentTab.url}, function(bookmarks) {
             bookmarks.forEach(function(bookmark) {
                 chrome.bookmarks.getSubTree(bookmark.parentId, function(results) {
-                    const select = document.getElementById('bookmarkFolderSelect');
                     results.forEach(function(result) {
                         const option = document.createElement('option');
                         option.text = result.title;
@@ -76,6 +75,36 @@ function populateBookmarkFolderOptions() {
             });
         });
     });
+}
+
+async function searchBookmarkFolder(){
+    const select = document.getElementById('folderBookmarks');
+    const folderId = document.getElementById('folderSelect').value;
+    select.innerHTML = '';
+    
+    const defaultOption = document.createElement('option');
+    defaultOption.text = 'Please select...';
+    defaultOption.value = '';
+    select.add(defaultOption);
+
+    const searchString = searchInput.value.toLowerCase();
+
+    chrome.bookmarks.getChildren(folderId, function(bookmarks) {
+        bookmarks.forEach(function(bookmark) {
+            if (bookmark.title.includes(searchString)){
+                const option = document.createElement('option');
+                option.text = bookmark.title;
+                option.value = bookmark.id;
+                option.href = bookmark.url;
+                select.add(option);
+                option.style.display = option.text.toLowerCase();
+            }
+        });
+    });
+    select.onchange = function() {
+        const bkmURL = select.options[select.selectedIndex].href;
+        chrome.tabs.create({ url: bkmURL, active: false });
+    };
 }
 
 
@@ -185,15 +214,8 @@ document.addEventListener('DOMContentLoaded', function() {
     populateFolderOptions();
     populateBookmarkFolderOptions();
     document.getElementById('setDefaultButton').addEventListener('click', setDefaultFolder);
+    document.getElementById('searchFolder').addEventListener('click', searchBookmarkFolder);
     document.getElementById('saveButton').addEventListener('click', saveBookmark);
     document.getElementById('moveButton').addEventListener('click',moveBookmark);
     document.getElementById('deleteButton').addEventListener('click', function() {deleteBookmark()});
-});
-
-chrome.commands.onCommand.addListener(function(command) {
-    if (command === "save-bookmark") {
-
-        populateFolderOptions();
-        saveBookmark();
-    }
 });
