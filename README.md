@@ -8,6 +8,8 @@ Allows for adding and deleting of tab's bookmark to/from multiple folders. Creat
 - Add bookmark(s) to selected folder (works on single and multiple highlighted tabs)
 - Delete bookmark(s) from selected folder (^ same)
 - Choose default folder for bookmarks to be saved to (persistent)
+- Search for bookmark based on keyword in selected folder
+- Open a selected bookmark
 - Keyboard shortcut for adding to default bookmark folder
 - Keyboard shortcut for deleting current bookmark from default folder, and subsequent presses delete from other location(s)
 
@@ -18,8 +20,9 @@ Allows for adding and deleting of tab's bookmark to/from multiple folders. Creat
 2. Go to extensions (chrome://extensions)
 3. Enable `Developer Mode` (top right)
 4. Click `Load Unpacked` and choose the `chrome-bookmark-manager` folder
-5. (Optional): Disable `Developer Mode`
-6. DONE
+5. Go into `Keyboard shortcuts` and set shortcuts if need be
+6. (Optional): Disable `Developer Mode`
+7. DONE
 
 ### Keyboard Shortcuts
 > :information_source: Before using, make sure to select a default folder
