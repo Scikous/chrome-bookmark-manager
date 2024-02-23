@@ -123,19 +123,18 @@ function saveBookmark() {
                     title: tab.title,
                     url: tab.url
                 };
-
                 // Save the bookmark using Chrome's bookmarks API
                 chrome.bookmarks.create(bookmark, function(result) {
                     // log result
-                    chrome.runtime.sendMessage({ message: ['Bookmark saved:', result] });
-                    chrome.storage.sync.set({'lastBookmarkedFolderID': folderId}, function() {
-                        chrome.runtime.sendMessage({ message: 'Folder ID saved'});
-                        });
-                    populateBookmarkFolderOptions();//refresh saved folders list of bookmark
-
+                    //chrome.runtime.sendMessage({ message: ['Bookmark saved:', result] });
                 });
             });
         }
+        chrome.storage.sync.set({'lastBookmarkedFolderID': folderId}, function() {
+            chrome.runtime.sendMessage({ message: 'Folder ID saved'});
+            });
+        populateBookmarkFolderOptions();//refresh saved folders list of bookmark
+
     });
     const feedbackDiv = document.getElementById('saved');
     feedbackDiv.textContent = 'Bookmark saved!';
