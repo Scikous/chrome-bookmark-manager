@@ -30,7 +30,6 @@ function saveBookmarkBG() {
 
 // Function to save the bookmark to the selected folder
 function deleteBookmarkBG() {
-
     chrome.storage.sync.get(['defaultFolderId'], function(result) {
         const defaultFolderId = result.defaultFolderId;
 
@@ -51,8 +50,6 @@ function deleteBookmarkBG() {
                         chrome.bookmarks.search({url: bookmark.url }, function(results) {
                             if (results.length > 0) {
                                 lastBookmarked = results.pop();
-                                console.log("Num bookmarks", results.length);
-                                
                                 chrome.bookmarks.remove(lastBookmarked.id, function() {
                                 console.log('Bookmark removed:', bookmark);
                                 });
