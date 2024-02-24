@@ -86,12 +86,17 @@ async function searchBookmarkFolder(){
     defaultOption.text = 'Please select...';
     defaultOption.value = '';
     select.add(defaultOption);
+    const openAllTabs = document.createElement('option');
+    openAllTabs.text = 'Open All';
+    openAllTabs.value = '';
+    select.add(openAllTabs);
 
     const searchString = searchInput.value.toLowerCase();
 
     chrome.bookmarks.getChildren(folderId, function(bookmarks) {
         bookmarks.forEach(function(bookmark) {
-            if (bookmark.title.includes(searchString)){
+
+            if (bookmark.title.toLowerCase().includes(searchString)){
                 const option = document.createElement('option');
                 option.text = bookmark.title;
                 option.value = bookmark.id;
@@ -102,8 +107,19 @@ async function searchBookmarkFolder(){
         });
     });
     select.onchange = function() {
-        const bkmURL = select.options[select.selectedIndex].href;
-        chrome.tabs.create({ url: bkmURL, active: false });
+        //chrome.runtime.sendMessage({ message: select.options[select.selectedIndex].text });
+        if (select.options[select.selectedIndex].text === "Open All"){//opens all tabs
+            select.selectedIndex += 1;//next index is supposedly a bookmarks
+            while (select.options[select.selectedIndex])//while bookmarks exist, open them
+            {
+                const bkmURL = select.options[select.selectedIndex].href;
+                chrome.tabs.create({ url: bkmURL, active: false });
+                select.selectedIndex += 1;
+            }
+        }else{//open single bookmark
+            const bkmURL = select.options[select.selectedIndex].href;
+            chrome.tabs.create({ url: bkmURL, active: false });
+        }
     };
 }
 
@@ -111,34 +127,33 @@ async function searchBookmarkFolder(){
 // Function to save the bookmark to the selected folder
 function saveBookmark() {
     const folderId = document.getElementById('folderSelect').value;
-
-    chrome.tabs.query({ 'currentWindow': true, 'highlighted': true }, function(tabs) {
-        // Check if there are any highlighted tabs
-        if (tabs && tabs.length > 0) {
-            // Iterate through the highlighted tabs
-            tabs.forEach(function(tab) {
-                // Create a new bookmark object
-                const bookmark = {
-                    parentId: folderId,
-                    title: tab.title,
-                    url: tab.url
-                };
-                // Save the bookmark using Chrome's bookmarks API
-                chrome.bookmarks.create(bookmark, function(result) {
-                    // log result
-                    //chrome.runtime.sendMessage({ message: ['Bookmark saved:', result] });
+    if (folderId){
+        chrome.tabs.query({ 'currentWindow': true, 'highlighted': true }, function(tabs) {
+            // Check if there are any highlighted tabs
+            if (tabs && tabs.length > 0) {
+                // Iterate through the highlighted tabs
+                tabs.forEach(function(tab) {
+                    // Create a new bookmark object
+                    const bookmark = {
+                        parentId: folderId,
+                        title: tab.title,
+                        url: tab.url
+                    };
+                    // Save the bookmark using Chrome's bookmarks API
+                    chrome.bookmarks.create(bookmark, function(result) {
+                        // log result
+                        //chrome.runtime.sendMessage({ message: ['Bookmark saved:', result] });
+                    });
                 });
-            });
-        }
-        chrome.storage.sync.set({'lastBookmarkedFolderID': folderId}, function() {
-            chrome.runtime.sendMessage({ message: 'Folder ID saved'});
-            });
-        populateBookmarkFolderOptions();//refresh saved folders list of bookmark
-
-    });
+            }
+            chrome.storage.sync.set({'lastBookmarkedFolderID': folderId}, function() {
+                chrome.runtime.sendMessage({ message: 'Folder ID saved'});
+                });
+            populateBookmarkFolderOptions();//refresh saved folders list of bookmark
+        });
+    }
     const feedbackDiv = document.getElementById('saved');
     feedbackDiv.textContent = 'Bookmark saved!';
-    //populateBookmarkFolderOptions();//refresh saved folders list of bookmark
 }
 
 function setDefaultFolder(){
@@ -154,39 +169,40 @@ function setDefaultFolder(){
 // Function to save the bookmark to the selected folder
 function deleteBookmark(foldElemID='bookmarkFolderSelect') {
     const folderId = document.getElementById(foldElemID).value;
-    chrome.tabs.query({ 'currentWindow': true, 'highlighted': true }, function(tabs) {
-    // Check if there are any highlighted tabs
-        if (tabs && tabs.length > 0) {
-            // Iterate through the highlighted tabs
-            tabs.forEach(function(tab) {
-                // Create a new bookmark object
-                const bookmark = {
-                    parentId: folderId,
-                    title: tab.title,
-                    url: tab.url
-                };
-                
-                // Delete the bookmark using Chrome's bookmarks API
-                chrome.bookmarks.search({ url: bookmark.url }, function(results) {
-                    if (results.length > 0) {//bookmark exists or not
-                        const chosenBookmarked = results.find((bookmarkID) => bookmarkID.parentId === bookmark.parentId);
-                        results.pop(chosenBookmarked);
-                        chrome.runtime.sendMessage({ message: ["Num bookmarks", results.length]});       
-                        chrome.bookmarks.remove(chosenBookmarked.id, function() {
-                        chrome.runtime.sendMessage({ message: ['Bookmark removed:', results, chosenBookmarked, bookmark.parentId] });
+    if (folderId){
+        chrome.tabs.query({ 'currentWindow': true, 'highlighted': true }, function(tabs) {
+        // Check if there are any highlighted tabs
+            if (tabs && tabs.length > 0) {
+                // Iterate through the highlighted tabs
+                tabs.forEach(function(tab) {
+                    // Create a new bookmark object
+                    const bookmark = {
+                        parentId: folderId,
+                        title: tab.title,
+                        url: tab.url
+                    };  
+                    // Delete the bookmark using Chrome's bookmarks API
+                    chrome.bookmarks.search({ url: bookmark.url }, function(results) {
+                        if (results.length > 0) {//bookmark exists or not
+                            const chosenBookmarked = results.find((bookmarkID) => bookmarkID.parentId === bookmark.parentId);
+                            results.pop(chosenBookmarked);
+                            //chrome.runtime.sendMessage({ message: ["Num bookmarks", results.length]});       
+                            chrome.bookmarks.remove(chosenBookmarked.id, function() {
+                            //chrome.runtime.sendMessage({ message: ['Bookmark removed:', results, chosenBookmarked, bookmark.parentId] });
 
-                        if (results.length > 0){//if no bookmark in any folder, then can't set other folder as default
-                            chrome.storage.sync.set({'lastBookmarkedFolderID': results.pop().id}, function() {
-                                chrome.runtime.sendMessage({ message: 'Default folder ID saved'});
-                                });
-                            }
-                        populateBookmarkFolderOptions();//refresh saved folders list of bookmark
-                        }); 
-                    }
+                            if (results.length > 0){//if no bookmark in any folder, then can't set other folder as default
+                                chrome.storage.sync.set({'lastBookmarkedFolderID': results.pop().id}, function() {
+                                    chrome.runtime.sendMessage({ message: 'Default folder ID saved'});
+                                    });
+                                }
+                            }); 
+                        }
+                    });
                 });
-            });
-        }
-    });
+            }
+            populateBookmarkFolderOptions();//refresh saved folders list of bookmark
+        });
+    }
     const feedbackDiv = document.getElementById('saved');
     feedbackDiv.textContent = 'Bookmark deleted!';
 }
