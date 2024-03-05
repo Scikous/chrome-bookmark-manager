@@ -43,7 +43,7 @@ async function populateFolderOptions() {
     });
 }
 
-
+//populate the dropdown which contains all of the folders where the bookmark has been saved to
 async function populateBookmarkFolderOptions() {
     const select = document.getElementById('bookmarkFolderSelect');
     select.innerHTML = '';
@@ -77,22 +77,30 @@ async function populateBookmarkFolderOptions() {
     });
 }
 
+//in a folder, search for some keyword, and return those bookmarks that match it
 async function searchBookmarkFolder(){
     const select = document.getElementById('folderBookmarks');
     const folderId = document.getElementById('folderSelect').value;
     select.innerHTML = '';
     
+    //to avoid the first bookmark from being unopenable
     const defaultOption = document.createElement('option');
     defaultOption.text = 'Please select...';
     defaultOption.value = '';
     select.add(defaultOption);
-    const openAllTabs = document.createElement('option');
-    openAllTabs.text = 'Open All';
-    openAllTabs.value = '';
-    select.add(openAllTabs);
+    //open all bookmarks that match the given keyword
+    const openAllBkms = document.createElement('option');
+    openAllBkms.text = 'Open All';
+    openAllBkms.value = '';
+    select.add(openAllBkms);
+
+    //delete all bookmarks that match the given keyword
+    const deleteAllBkms = document.createElement('option');
+    deleteAllBkms.text = 'Delete All';
+    deleteAllBkms.value = '';
+    select.add(deleteAllBkms);
 
     const searchString = searchInput.value.toLowerCase();
-
     chrome.bookmarks.getChildren(folderId, function(bookmarks) {
         bookmarks.forEach(function(bookmark) {
 
@@ -106,25 +114,47 @@ async function searchBookmarkFolder(){
             }
         });
     });
+    bkmOptionMonitor(select);
+}
+
+//after finding and populating the dropdown menu with all found bookmarks, setup the monitor for any changes
+function bkmOptionMonitor(select){
+    //open bookmark(s) upon selecting a choice from dropdown menu
     select.onchange = function() {
-        //chrome.runtime.sendMessage({ message: select.options[select.selectedIndex].text });
-        if (select.options[select.selectedIndex].text === "Open All"){//opens all tabs
-            select.selectedIndex += 1;//next index is supposedly a bookmarks
-            while (select.options[select.selectedIndex])//while bookmarks exist, open them
-            {
-                const bkmURL = select.options[select.selectedIndex].href;
-                chrome.tabs.create({ url: bkmURL, active: false });
+        const selectedOption = select.options[select.selectedIndex]
+        const confirmationMessage = selectedOption.text === "Open All" ?
+        "Open all matching bookmarks from this folder?" :
+        "Delete all matching bookmarks from this folder?";
+    
+        if (selectedOption.text === "Open All" || selectedOption.text === "Delete All") {
+            if (confirm(confirmationMessage)) {
+              select.selectedIndex += 1;
+              while (select.options[select.selectedIndex]) {
+                const bkm = select.options[select.selectedIndex];
+                if (bkm.href) {
+                  if (selectedOption.text === "Open All") {
+                    chrome.tabs.create({ url: bkm.href, active: false });
+                  } else {
+                    chrome.bookmarks.remove(bkm.value);
+                  }
+                }
                 select.selectedIndex += 1;
+              }
+              if (selectedOption.text == "Delete All")//auto refresh dropdown menu, no need to do it for opening actions
+                  searchBookmarkFolder();
             }
-        }else{//open single bookmark
-            const bkmURL = select.options[select.selectedIndex].href;
-            chrome.tabs.create({ url: bkmURL, active: false });
-        }
-    };
+          } else {
+            // Open a single bookmark
+            const bkmURL = selectedOption.href;
+            if (bkmURL) {
+              chrome.tabs.create({ url: bkmURL, active: false });
+            }
+          }
+        };
 }
 
 
-// Function to save the bookmark to the selected folder
+// Function to save the bookmark to a selected folder
 function saveBookmark() {
     const folderId = document.getElementById('folderSelect').value;
     if (folderId){
@@ -156,6 +186,7 @@ function saveBookmark() {
     feedbackDiv.textContent = 'Bookmark saved!';
 }
 
+//set a default folder which to save bookmarks to
 function setDefaultFolder(){
     const folderId = document.getElementById('folderSelect').value;
     chrome.storage.sync.set({'defaultFolderId': folderId}, function() {
@@ -166,7 +197,7 @@ function setDefaultFolder(){
     feedbackDiv.textContent = 'Default folder set!';
 }
 
-// Function to save the bookmark to the selected folder
+// delete the bookmark from a selected folder
 function deleteBookmark(foldElemID='bookmarkFolderSelect') {
     const folderId = document.getElementById(foldElemID).value;
     if (folderId){
@@ -207,7 +238,8 @@ function deleteBookmark(foldElemID='bookmarkFolderSelect') {
     feedbackDiv.textContent = 'Bookmark deleted!';
 }
 
-function moveBookmark(){//move bookmark from one folder to another
+//move bookmark from one folder to another
+function moveBookmark(){
     const feedbackDiv = document.getElementById('saved');
     const numBookmarks = document.getElementById('bookmarkFolderSelect').length;
     if (numBookmarks > 0){

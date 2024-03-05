@@ -10,7 +10,8 @@ Allows for adding and deleting of tab's bookmark to/from multiple folders. Creat
 - Choose default folder for bookmarks to be saved to (persistent)
 - Search for bookmark based on keyword in selected folder
 - Open selected bookmark in a new tab
-- Open all bookmarks in new tabs
+- Open all keyword matching bookmarks in new tabs
+- Delete all keyword matching bookmarks from a folder
 - Keyboard shortcut for adding to default bookmark folder
 - Keyboard shortcut for deleting current bookmark from default folder, and subsequent presses delete from other folders
 
