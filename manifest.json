@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Bookmark Manager",
   "description": "For bookmark management",
-  "version": "1.0",
+  "version": "1.01",
   "permissions": ["tabs", "background", "bookmarks", "storage"],
   "action": {
     "default_popup": "popup.html",
